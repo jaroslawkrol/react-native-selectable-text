@@ -1,36 +1,74 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
     repositories {
+        google()
         jcenter()
     }
-
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.1'
+        classpath("com.android.tools.build:gradle:3.4.2")
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
     }
+}
+
+def getExtOrInitialValue(name, initialValue) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : initialValue
+}
+
+def getExtOrDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['ReactNativeSelectableText_' + name]
+}
+
+def getExtOrIntegerDefault(name) {
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['ReactNativeSelectableText_' + name]).toInteger()
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+  compileSdkVersion 28
+  buildToolsVersion "28.0.3"
 
-    defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
-    }
-    lintOptions {
-        abortOnError false
-    }
+  defaultConfig {
+    minSdkVersion 16
+    targetSdkVersion 28
+  }
+  lintOptions{
+    abortOnError false
+  }
 }
 
 repositories {
-    mavenCentral()
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
+
+        google()
+        jcenter()
+        mavenCentral()
 }
 
 dependencies {
-    compile 'com.facebook.react:react-native:+'
+  //noinspection GradleDynamicVersion
+  implementation 'com.facebook.react:react-native:+'
+
+  def supportLibVersion = getExtOrInitialValue('supportLibVersion', getExtOrInitialValue('supportVersion', null))
+  def androidXVersion = getExtOrInitialValue('androidXVersion', null)
+  def androidXCore = getExtOrInitialValue('androidXCore', null)
+  if (supportLibVersion && androidXVersion == null && androidXCore == null) {
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+  } else {
+    def defaultAndroidXVersion = "1.+"
+    if (androidXCore == null) {
+      androidXCore = androidXVersion == null ? defaultAndroidXVersion : androidXVersion
+    }
+    implementation "androidx.core:core:$androidXCore"
+  }
 }
-  
