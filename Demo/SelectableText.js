@@ -79,9 +79,7 @@ export const SelectableText = ({ onSelection, onHighlightPress, value, children,
             ? ({ nativeEvent: { clickedRangeStart, clickedRangeEnd } }) => {
                 if (!props.highlights || props.highlights.length === 0) return
 
-                const mergedHighlights = combineHighlights(props.highlights)
-
-                const hightlightInRange = mergedHighlights.find(
+                const hightlightInRange = props.highlights.find(
                     ({ start, end }) => clickedRangeStart >= start - 1 && clickedRangeEnd <= end + 1,
                 )
 
@@ -94,36 +92,36 @@ export const SelectableText = ({ onSelection, onHighlightPress, value, children,
 
     return (
         <RNSelectableText
-    {...props}
-    onHighlightPress={onHighlightPressNative}
-    selectable
-    onSelection={onSelectionNative}
-        >
-        <Text selectable key={v4()}>
-        {props.highlights && props.highlights.length > 0
-                ? mapHighlightsRanges(value, props.highlights).map(({ id, isHighlight, text }) => (
-                    <Text
-                key={v4()}
+            {...props}
+            onHighlightPress={onHighlightPressNative}
             selectable
-                style={
-                    isHighlight
-                            ? {
-                            backgroundColor: props.highlightColor,
-                        }
-                        : {}
-                }
-            onPress={() => {
-        if (isHighlight) {
-            onHighlightPress && onHighlightPress(id)
-        }
-    }}
->
-    {text}
-</Text>
-))
-: value}
-    {props.appendToChildren ? props.appendToChildren : null}
-</Text>
-    </RNSelectableText>
-)
+            onSelection={onSelectionNative}
+        >
+            <Text selectable key={v4()}>
+                {props.highlights && props.highlights.length > 0
+                    ? mapHighlightsRanges(value, props.highlights).map(({ id, isHighlight, text }) => (
+                        <Text
+                            key={v4()}
+                            selectable
+                            style={
+                                isHighlight
+                                    ? {
+                                        backgroundColor: props.highlightColor,
+                                    }
+                                    : {}
+                            }
+                            onPress={() => {
+                                if (isHighlight) {
+                                    onHighlightPress && onHighlightPress(id)
+                                }
+                            }}
+                        >
+                            {text}
+                        </Text>
+                    ))
+                    : value}
+                {props.appendToChildren ? props.appendToChildren : null}
+            </Text>
+        </RNSelectableText>
+    )
 }
