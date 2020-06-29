@@ -19,8 +19,18 @@ const instructions = Platform.select({
 });
 
 type Props = {};
+
 export default class App extends Component<Props> {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            highlights: []
+        }
+    }
+
   render() {
+        console.log('highlights', this.state, this.state.highlights)
     return (
       <View style={styles.container}>
         <SelectableText
@@ -41,8 +51,17 @@ export default class App extends Component<Props> {
         <SelectableText
           selectable={true}
           menuItems={["Astro", "Coders"]}
-          onSelection={console.log}
+          onSelection={({ content, eventType, selectionStart, selectionEnd }) =>
+              this.changeSelection(
+                  selectionStart,
+                  selectionEnd,
+                  content,
+                  eventType,
+              )
+          }
           style={styles.instructions}
+          highlights={this.state.highlights}
+          highlightColor={'red,'}
           value="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eleifend laoreet risus nec accumsan. In bibendum urna id ante vehicula auctor. Donec ipsum nisi, malesuada quis erat ac, molestie facilisis lacus. Vestibulum a erat dui. In imperdiet, purus at venenatis fermentum, dui neque congue est, in suscipit metus magna malesuada ex. In hendrerit tincidunt mi, vel rhoncus eros dignissim non. Nulla tincidunt, tortor et dictum fermentum, sapien leo blandit nunc, nec rutrum nulla libero nec elit. Sed vitae urna sed eros volutpat venenatis. Nulla finibus velit ac odio elementum pharetra. Ut mollis metus est, vitae blandit urna venenatis at."
         />
         <SelectableText
@@ -55,6 +74,23 @@ export default class App extends Component<Props> {
       </View>
     );
   }
+
+    changeSelection = (
+        start,
+        end,
+        content,
+        eventType,
+    ) => {
+        console.log('abcd', start, end, content);
+        const newHighlight = {
+            id: `${content.length}`,
+            start: start,
+            end: end,
+            text: content,
+        };
+        this.setState({ highlights: [...this.state.highlights, newHighlight] });
+    };
+
 }
 
 const styles = StyleSheet.create({

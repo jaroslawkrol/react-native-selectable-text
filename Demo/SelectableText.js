@@ -1,29 +1,29 @@
 import React from 'react'
 import { Text, requireNativeComponent, Platform } from 'react-native'
 import { v4 } from 'uuid'
-import memoize from 'fast-memoize'
+import LinearGradient from "react-native-linear-gradient";
 
 const RNSelectableText = requireNativeComponent('RNSelectableText')
 
 /**
  * numbers: array({start: int, end: int, id: string})
  */
-const combineHighlights = memoize(numbers => {
-  return numbers
-    .sort((a, b) => a.start - b.start || a.end - b.end)
-    .reduce(function(combined, next) {
-      if (!combined.length || combined[combined.length - 1].end < next.start) combined.push(next)
-      else {
-        var prev = combined.pop()
-        combined.push({
-          start: prev.start,
-          end: Math.max(prev.end, next.end),
-          id: next.id,
-        })
-      }
-      return combined
-    }, [])
-})
+const combineHighlights = numbers => {
+    return numbers
+        .sort((a, b) => a.start - b.start || a.end - b.end)
+        .reduce(function(combined, next) {
+            if (!combined.length || combined[combined.length - 1].end < next.start) combined.push(next)
+            else {
+                var prev = combined.pop()
+                combined.push({
+                    start: prev.start,
+                    end: Math.max(prev.end, next.end),
+                    id: next.id,
+                })
+            }
+            return combined
+        }, [])
+}
 
 /**
  * value: string
@@ -101,22 +101,24 @@ export const SelectableText = ({ onSelection, onHighlightPress, value, children,
     >
       <Text selectable key={v4()}>
         {props.highlights && props.highlights.length > 0
-          ? mapHighlightsRanges(value, props.highlights).map(({ id, isHighlight, text }) => (
+          ? mapHighlightsRanges(value, props.highlights).map(({ id, isHighlight, text }) => isHighlight ? (
+              <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']}>
+                  <Text
+                      key={v4()}
+                      selectable
+                      onPress={() => {
+                          if (isHighlight) {
+                              onHighlightPress && onHighlightPress(id)
+                          }
+                      }}
+                  >
+                      {text}
+                  </Text>
+              </LinearGradient>
+            ) : (
               <Text
                 key={v4()}
                 selectable
-                style={
-                  isHighlight
-                    ? {
-                        backgroundColor: props.highlightColor,
-                      }
-                    : {}
-                }
-                onPress={() => {
-                  if (isHighlight) {
-                    onHighlightPress && onHighlightPress(id)
-                  }
-                }}
               >
                 {text}
               </Text>
